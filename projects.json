@@ -1,0 +1,33 @@
+{
+  "site": {
+    "title": "Arthur Kwok Web Apps",
+    "tagline": "個人 Web 專案導覽"
+  },
+  "categories": ["Tool", "Analytics", "Presentation"],
+  "projects": [
+    {
+      "name": "TodoList",
+      "description": "個人待辦清單應用：新增、刪除、標記完成，支援 localStorage 持久化與深色模式，採用玻璃擬態現代 UI。",
+      "stack": ["HTML", "CSS", "JavaScript"],
+      "category": "Tool",
+      "status": "已上線",
+      "url": "todolist/"
+    },
+    {
+      "name": "銷售儀表板",
+      "description": "由 Dashboard_Data.xlsx（99 筆 SalesData，2018–2020）自動生成的自包含互動儀表板：KPI、年度／月份／目的地／產品圖表、可搜尋排序明細表。",
+      "stack": ["HTML", "SVG", "JavaScript", "XLSX 資料"],
+      "category": "Analytics",
+      "status": "已上線",
+      "url": "dashboard/"
+    },
+    {
+      "name": "會議簡報｜AI 課程與 OpenClaw",
+      "description": "由 2026-07-06 會議原始記錄生成的 14 頁 16:9 HTML 簡報：鍵盤導覽、全螢幕、投影片總覽、講者備註與 PDF 列印模式。",
+      "stack": ["HTML", "CSS", "JavaScript", "DOCX 資料"],
+      "category": "Presentation",
+      "status": "已上線",
+      "url": "slides/"
+    }
+  ]
+}

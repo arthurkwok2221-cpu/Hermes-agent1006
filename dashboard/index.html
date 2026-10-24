@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>銷售儀表板｜Dashboard_Data.xlsx</title>
+<style>
+:root{
+  --bg:#f5f7fb;--surface:#ffffff;--ink:#1a2233;--muted:#5b6478;
+  --border:#e2e7f0;--accent:#2f6fed;--accent-soft:#eaf1ff;
+  --good:#1a9e5c;--warn:#d9821a;--bad:#d64545;
+  --shadow:0 1px 3px rgba(20,30,60,.08);--radius:12px;
+  --font:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0f131c;--surface:#171d2b;--ink:#e8ecf5;--muted:#98a2ba;
+  --border:#2a3346;--accent:#5b8cff;--accent-soft:#1d2c4d;--shadow:0 1px 3px rgba(0,0,0,.5)}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 48px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:19px;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 12px;color:var(--muted);font-weight:600}
+.meta{color:var(--muted);font-size:13px;margin-bottom:18px}
+.meta code{background:var(--accent-soft);padding:2px 7px;border-radius:6px;font-size:12px;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.card.flat{box-shadow:none;border:none}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.kpi{padding:16px 18px}
+.kpi .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.kpi .val{font-size:26px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.kpi.hl .val{color:var(--accent)}
+.cols2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:5px;min-width:140px;flex:1}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+.field select,.field input{height:40px;padding:0 12px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.field select:focus,.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{height:40px;padding:0 18px;font:inherit;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--border)}
+.btn:focus-visible,select:focus-visible,input:focus-visible,th[aria-sort]{outline:2px solid var(--accent);outline-offset:1px}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:13.5px}
+thead th{background:var(--accent-soft);color:var(--ink);text-align:left;padding:11px 12px;font-weight:600;position:sticky;top:0;cursor:pointer;user-select:none;white-space:nowrap}
+thead th::after{content:"↕";opacity:.35;margin-left:5px;font-size:11px}
+thead th[aria-sort="ascending"]::after{content:"▲";opacity:1;color:var(--accent)}
+thead th[aria-sort="descending"]::after{content:"▼";opacity:1;color:var(--accent)}
+tbody td{padding:9px 12px;border-top:1px solid var(--border);white-space:nowrap}
+tbody tr:hover{background:var(--accent-soft)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.searchbox{width:100%}
+.tblfoot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:13px;color:var(--muted)}
+.tip{position:fixed;z-index:50;background:#1a2233;color:#fff;font-size:12px;padding:8px 11px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .12s;max-width:280px;line-height:1.45;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.tip.show{opacity:1}
+.tip b{color:#fff}
+.hbar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13px}
+.hbar .name{width:70px;color:var(--muted);flex-shrink:0}
+.hbar .track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.hbar .fill{height:100%;background:var(--accent);border-radius:5px}
+.hbar .pct{width:48px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.note{font-size:13px;color:var(--muted);background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0}
+.note code{background:none;padding:0;font-size:12px}
+.callout{font-size:14px;padding:12px 14px;border-radius:8px;margin:8px 0}
+.callout.risk{background:rgba(214,69,69,.1);border-left:3px solid var(--bad)}
+.callout.ins{background:rgba(47,111,237,.08);border-left:3px solid var(--accent)}
+.callout.good{background:rgba(26,158,92,.1);border-left:3px solid var(--good)}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+@media (max-width:640px){
+  .wrap{padding:14px 12px 32px}
+  h1{font-size:21px}.kpi .val{font-size:22px}
+  table{font-size:12.5px}thead th,tbody td{padding:8px 9px}
+}
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--muted:#444;--border:#ccc;--accent:#2f6fed;--accent-soft:#eef3ff;--shadow:none}
+  body{background:#fff}
+  .card,.kpi,.tblwrap{page-break-inside:avoid;box-shadow:none;border-color:#ccc}
+  .no-print{display:none!important}
+  .wrap{padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>銷售績效儀表板</h1>
+  <p class="meta">
+    報告期間：<b>2018 至 2020 年</b>（2018-01-11 至 2020-12-27）｜資料來源：<code>Dashboard_Data.xlsx</code>（工作表 <code>SalesData</code>，共 99 筆訂單）
+  </p>
+</header>
+
+<section class="card" aria-labelledby="sumh">
+  <div class="section-head"><h2 id="sumh">管理層摘要</h2><span class="pill">全期間</span></div>
+  <p>本儀表板彙整 <b>99 筆銷售訂單</b>，涵蓋 5 個目的地市場（AU、HK、JP、UK、US）與 6 項產品（PTS-10、PTS-11、PTS-12、PTS-13、PTS-14、PTS-15）。全期間累計營收 <b>HK$ 9,890,000</b>，總銷量 705 件，平均每單營收 HK$ 99,898。目的地方面，<b>AU</b> 市場貢獻最高營收（占 50.2%）；年份趨勢上，<b>2018 年</b>為營收高峰（HK$ 4,010,000）。</p>
+  <div class="callout ins">💡 <b>洞察</b>：營收高度集中於前兩大目的地市場（AU、US），合計佔全期營收 80%。若目標為市場多元化，應評估滯後市場（UK、JP、HK）的推廣資源配置。本頁所有圖表、篩選與明細均僅取自來源檔案既有欄位，未加入任何外部資料或假設。</div>
+</section>
+
+<section class="card" aria-labelledby="kpih">
+  <div class="section-head"><h2 id="kpih">關鍵 KPI</h2><span class="pill">全期間</span></div>
+  <div class="grid kpis">
+    <div class="card flat kpi hl"><div class="label">總營收</div><div class="val">HK$ 9,890,000</div><div class="sub">99 筆訂單</div></div>
+    <div class="card flat kpi"><div class="label">總銷量（件）</div><div class="val">705</div><div class="sub">含所有訂單</div></div>
+    <div class="card flat kpi"><div class="label">平均每單營收</div><div class="val">HK$ 99,898</div><div class="sub">總營收 ÷ 訂單數</div></div>
+    <div class="card flat kpi"><div class="label">訂單數</div><div class="val">99</div><div class="sub">2018–2020</div></div>
+    <div class="card flat kpi"><div class="label">總毛利（估算）</div><div class="val">HK$ 3,243,000</div><div class="sub">Σ(單價−成本)×數量</div></div>
+    <div class="card flat kpi"><div class="label">毛利率（估算）</div><div class="val">32.8%</div><div class="sub">毛利 ÷ 營收</div></div>
+  </div>
+  <p class="note">註：「毛利／毛利率」依來源檔案 <code>UnitPrice</code> 與 <code>UnitCost</code> 欄位計算之估算值；來源未提供實際成本帳務，僅供參考。</p>
+</section>
+
+<section class="card" aria-labelledby="chh">
+  <div class="section-head"><h2 id="chh">關鍵趨勢與分類分析</h2><span class="pill">依年度</span></div>
+  <div class="grid cols2">
+    <div>
+      <h3>年度營收與銷量</h3>
+      <svg id="chartYear" class="chart" role="img" aria-label="各年度營收柱狀圖與銷量折線圖" viewBox="0 0 560 280"></svg>
+      <div class="legend"><span><i style="background:var(--accent)"></i>營收（左軸）</span><span><i style="background:var(--good)"></i>銷量（右軸）</span></div>
+    </div>
+    <div>
+      <h3>各月份營收（2018–2020）</h3>
+      <svg id="chartMonth" class="chart" role="img" aria-label="各月份營收與銷量趨勢圖" viewBox="0 0 560 280"></svg>
+    </div>
+  </div>
+  <div class="grid cols2" style="margin-top:20px">
+    <div>
+      <h3>按目的地之營收占比</h3>
+      <svg id="chartDest" class="chart" role="img" aria-label="各目的地營收占比環形圖" viewBox="0 0 560 280"></svg>
+      <div class="legend" id="legendDest"></div>
+    </div>
+    <div>
+      <h3>按產品之營收</h3>
+      <svg id="chartProd" class="chart" role="img" aria-label="各產品營收條形圖" viewBox="0 0 560 280"></svg>
+    </div>
+  </div>
+  <h3 style="margin-top:20px">目的地市場佔比</h3>
+  <div id="destBars"></div>
+</section>
+
+<section class="card" aria-labelledby="riskh">
+  <div class="section-head"><h2 id="riskh">風險、異常與建議行動</h2></div>
+  <div class="callout risk">⚠️ <b>市場集中度風險</b>：前兩大目的地市場（AU、US）合計佔全期營收 80%，單一市場波動對整體影響顯著。<b>建議</b>：為滯後市場（UK、JP、HK）制定獨立成長目標與行銷資源配置。</div>
+  <div class="callout risk">📉 <b>年度營收下滑</b>：2020 年營收 HK$ 2,460,000，較 2018 年（HK$ 4,010,000）下降 38.7%；訂單量由 39 筆降至 24 筆。<b>建議</b>：檢視 2020 年需求下滑原因（價格、競爭或市場縮減），並設季度追蹤指標。</div>
+  <div class="callout ins">🔍 <b>異常訂單（營收前 5 名）</b>：以下訂單單筆營收顯著高於全期平均（HK$ 99,898），應確認是否屬批量採購、匯率異常或錄入錯誤。</div>
+  <div class="tblwrap" style="margin:8px 0 14px"><table>
+    <thead><tr><th style="cursor:default">訂單編號</th><th style="cursor:default">日期</th><th style="cursor:default">產品</th><th style="cursor:default">目的地</th><th style="cursor:default">客戶</th><th class="num" style="cursor:default">單筆營收</th></tr></thead>
+    <tbody><tr><td>INV049</td><td>2018-11-09</td><td>PTS-14</td><td>AU</td><td>Barbara Alexande</td><td class='num'>330,000</td></tr><tr><td>INV003</td><td>2020-07-28</td><td>PTS-14</td><td>UK</td><td>Anna Cooper</td><td class='num'>300,000</td></tr><tr><td>INV004</td><td>2020-04-30</td><td>PTS-14</td><td>US</td><td>Russell Lopez</td><td class='num'>288,000</td></tr><tr><td>INV086</td><td>2018-08-31</td><td>PTS-10</td><td>AU</td><td>Billy Price</td><td class='num'>270,000</td></tr><tr><td>INV087</td><td>2019-04-01</td><td>PTS-14</td><td>AU</td><td>Eugene Ross</td><td class='num'>252,000</td></tr></tbody>
+  </table></div>
+  <div class="callout good">✅ <b>資料完整性</b>：全部 99 筆記錄欄位齊全、無空白值；<code>SA1</code> 與 <code>SA2</code> 經核對均等於 <code>UnitPrice × Qty</code>（差異為零），<code>Date1</code> 與 <code>Date2</code> 亦完全一致，資料品質可靠。</div>
+</section>
+
+<section class="card no-print" aria-labelledby="tblh">
+  <div class="section-head"><h2 id="tblh">訂單明細（可搜尋、可排序、可篩選）</h2><span class="pill" id="rowCount">99 筆</span></div>
+  <div class="filters" style="margin-bottom:16px">
+    <div class="field" style="flex:2"><label for="q">搜尋（訂單號／產品／客戶／目的地）</label><input id="q" class="searchbox" type="search" placeholder="例：PTS-11、Anna、US…" aria-label="搜尋明細"></div>
+    <div class="field"><label for="fDest">目的地</label><select id="fDest"><option value="">全部</option><option>AU</option><option>HK</option><option>JP</option><option>UK</option><option>US</option></select></div>
+    <div class="field"><label for="fProd">產品</label><select id="fProd"><option value="">全部</option><option>PTS-10</option><option>PTS-11</option><option>PTS-12</option><option>PTS-13</option><option>PTS-14</option><option>PTS-15</option></select></div>
+    <div class="field"><label for="fYear">年度</label><select id="fYear"><option value="">全部</option><option>2018</option><option>2019</option><option>2020</option></select></div>
+    <button class="btn ghost" id="reset" type="button" aria-label="重設所有篩選器">重設</button>
+  </div>
+  <div class="tblwrap"><table id="detail">
+    <thead><tr>
+      <th data-k="0">訂單編號</th><th data-k="1">日期</th><th data-k="2">產品</th><th data-k="3">目的地</th><th data-k="4">客戶</th>
+      <th data-k="5" class="num">單價（UnitPrice）</th><th data-k="6" class="num">單位成本（UnitCost）</th><th data-k="7" class="num">數量</th><th data-k="8" class="num">營收（Revenue）</th>
+    </tr></thead>
+    <tbody id="detailBody"></tbody>
+  </table></div>
+  <div class="tblfoot"><span id="tblNote">顯示 99 / 99 筆（全數）</span><span>排序：點擊欄標題｜篩選：上方搜尋與下拉選單</span></div>
+</section>
+
+<footer style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0 24px">
+  儀表板由 <code>Dashboard_Data.xlsx</code> 自動產生｜所有數值僅取自來源檔案，未加入外部資料或推論｜可於瀏覽器「列印」匯出 PDF
+</footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const DATA = [["INV001","2019-06-27","PTS-11","AU","Chris Ward",17000,14000,8,136000],["INV002","2018-06-25","PTS-14","US","Kathryn Diaz",28000,18000,7,196000],["INV003","2020-07-28","PTS-14","UK","Anna Cooper",25000,18000,12,300000],["INV004","2020-04-30","PTS-14","US","Russell Lopez",32000,18000,9,288000],["INV005","2020-08-05","PTS-15","HK","Mary Thompson",9000,7000,5,45000],["INV006","2018-09-16","PTS-13","AU","Joyce Smith",23000,13000,6,138000],["INV007","2018-06-01","PTS-14","AU","Janice Martin",20000,18000,10,200000],["INV008","2020-11-25","PTS-11","HK","Paul Harris",7000,4000,8,56000],["INV009","2020-11-05","PTS-10","US","Irene Hughes",23000,14000,7,161000],["INV010","2019-09-27","PTS-13","AU","Stephanie Ed",22000,13000,8,176000],["INV011","2020-02-04","PTS-12","AU","Evelyn Jenkins",4000,3000,8,32000],["INV012","2018-08-17","PTS-14","UK","Teresa Clark",22000,18000,5,110000],["INV013","2019-01-27","PTS-11","US","Jessica Johnson",4000,4000,5,20000],["INV014","2018-08-16","PTS-12","US","Patricia Scott",6000,3000,5,30000],["INV015","2018-04-17","PTS-12","JP","Lois Brooks",5000,3000,8,40000],["INV016","2020-09-03","PTS-11","US","Keith Campbell",7000,4000,5,35000],["INV017","2019-05-10","PTS-12","UK","Philip Wright",4000,3000,7,28000],["INV018","2018-01-13","PTS-10","AU","Brandon Lee",18000,14000,7,126000],["INV019","2019-10-24","PTS-15","AU","Jose Miller",11000,7000,9,99000],["INV020","2019-12-04","PTS-13","AU","Gregory Simmons",23000,13000,6,138000],["INV021","2018-05-10","PTS-10","US","Stephen Stewart",22000,14000,9,198000],["INV022","2020-06-03","PTS-13","JP","Thomas Davis",25000,13000,6,150000],["INV023","2019-12-16","PTS-13","UK","Karen Peterson",21000,13000,5,105000],["INV024","2020-07-16","PTS-14","US","Juan Torres",19000,18000,5,95000],["INV025","2019-06-25","PTS-15","US","Denise King",11000,7000,6,66000],["INV026","2018-01-27","PTS-12","UK","Carolyn Gonzales",5000,3000,6,30000],["INV027","2019-01-20","PTS-12","US","Melissa Rogers",5000,3000,5,25000],["INV028","2019-07-26","PTS-12","AU","Harry Carter",5000,3000,7,35000],["INV029","2019-08-16","PTS-15","JP","Ronald Phillips",9000,7000,6,54000],["INV030","2020-04-17","PTS-12","US","Gloria Murphy",5000,3000,7,35000],["INV031","2018-10-12","PTS-15","AU","Matthew Watson",9000,7000,7,63000],["INV032","2020-10-17","PTS-12","AU","Ashley Hernandez",6000,3000,8,48000],["INV033","2018-11-30","PTS-13","UK","Timothy Powell",16000,13000,6,96000],["INV034","2019-06-26","PTS-15","AU","Roger Wilson",9000,7000,10,90000],["INV035","2019-07-09","PTS-10","US","Jeremy Morgan",16000,14000,5,80000],["INV036","2020-01-26","PTS-13","US","Benjamin Gray",23000,13000,10,230000],["INV037","2020-05-30","PTS-12","US","Louise Walker",3000,3000,7,21000],["INV038","2019-10-27","PTS-14","AU","Lawrence Wash",21000,18000,7,147000],["INV039","2018-10-25","PTS-10","AU","Jennifer Moore",21000,14000,5,105000],["INV040","2019-10-17","PTS-11","US","Eric Ramirez",8000,4000,6,48000],["INV041","2018-10-28","PTS-15","HK","Margaret Wood",8000,7000,6,48000],["INV042","2018-02-02","PTS-11","JP","Diana Nelson",4000,4000,9,36000],["INV043","2018-12-16","PTS-11","UK","Roy Butler",5000,4000,6,30000],["INV044","2018-07-30","PTS-13","AU","Ernest Lewis",18000,13000,6,108000],["INV045","2019-02-12","PTS-15","AU","Michael Sanchez",11000,7000,5,55000],["INV046","2019-06-23","PTS-12","UK","Catherine Collin",6000,6000,6,36000],["INV047","2019-07-05","PTS-14","AU","Phillip Reed",35000,18000,5,175000],["INV048","2020-03-23","PTS-13","US","Betty Sanders",13000,13000,9,117000],["INV049","2018-11-09","PTS-14","AU","Barbara Alexande",33000,18000,10,330000],["INV050","2019-11-03","PTS-11","AU","Annie Bailey",8000,4000,6,48000],["INV051","2018-05-21","PTS-11","HK","Doris Jones",5000,4000,10,50000],["INV052","2020-12-27","PTS-11","HK","Donald Anderson",4000,4000,8,32000],["INV053","2019-03-15","PTS-15","JP","Brian Flores",10000,7000,6,60000],["INV054","2019-12-17","PTS-10","AU","Linda Foster",20000,14000,5,100000],["INV055","2020-03-14","PTS-11","US","Clarence Willia",7000,4000,10,70000],["INV056","2020-10-30","PTS-12","US","Jason Kelly",3000,3000,5,15000],["INV057","2020-08-24","PTS-11","US","Deborah Hall",5000,4000,5,25000],["INV058","2018-06-03","PTS-15","AU","Wayne Howard",13000,7000,9,117000],["INV059","2018-02-28","PTS-12","UK","Scott Adams",3000,3000,10,30000],["INV060","2018-12-29","PTS-15","US","Bruce Hill",11000,7000,7,77000],["INV061","2018-06-10","PTS-11","US","Joe Robinson",6000,4000,8,48000],["INV062","2018-10-13","PTS-11","JP","Anne Bryant",6000,4000,8,48000],["INV063","2018-03-03","PTS-13","AU","Peter Russell",16000,13000,6,96000],["INV064","2019-05-13","PTS-10","AU","Fred Jackson",20000,14000,10,200000],["INV065","2018-04-12","PTS-13","US","Amanda Cox",25000,13000,9,225000],["INV066","2019-01-21","PTS-10","AU","Brenda Patterson",15000,14000,5,75000],["INV067","2019-05-30","PTS-15","AU","Shirley Martine",8000,7000,6,48000],["INV068","2018-11-26","PTS-14","AU","Joshua Bell",19000,18000,6,114000],["INV069","2020-05-12","PTS-13","US","Raymond Baker",15000,13000,8,120000],["INV070","2019-11-06","PTS-10","AU","Elizabeth Gonz",23000,14000,5,115000],["INV071","2020-11-25","PTS-12","AU","John Evans",5000,3000,9,45000],["INV072","2018-12-22","PTS-11","AU","Rose Rivera",6000,4000,6,36000],["INV073","2019-09-28","PTS-14","US","Bobby Allen",22000,18000,5,110000],["INV074","2019-03-25","PTS-15","AU","Steve Perry",12000,7000,9,108000],["INV075","2019-12-01","PTS-14","AU","Terry Rodrig",36000,18000,6,216000],["INV076","2018-01-18","PTS-11","AU","Amy Long",5000,4000,7,35000],["INV077","2018-11-19","PTS-11","UK","Sandra Cook",6000,4000,7,42000],["INV078","2018-06-14","PTS-14","US","Jonathan Green",19000,18000,6,114000],["INV079","2018-05-06","PTS-11","US","William Griffin",7000,4000,5,35000],["INV080","2019-09-14","PTS-14","AU","Dorothy Bennett",29000,18000,7,203000],["INV081","2020-08-30","PTS-13","JP","Kevin Turner",18000,13000,5,90000],["INV082","2018-09-02","PTS-12","AU","Walter White",5000,3000,9,45000],["INV083","2019-02-12","PTS-11","AU","Angela Parker",5000,4000,6,30000],["INV084","2020-06-22","PTS-12","HK","Gerald Barnes",5000,3000,9,45000],["INV085","2019-03-10","PTS-12","AU","Todd Thomas",6000,3000,5,30000],["INV086","2018-08-31","PTS-10","AU","Billy Price",27000,14000,10,270000],["INV087","2019-04-01","PTS-14","AU","Eugene Ross",28000,18000,9,252000],["INV088","2019-03-17","PTS-12","AU","Adam Young",4000,3000,9,36000],["INV089","2019-10-11","PTS-12","AU","Marie Henderson",3000,3000,5,15000],["INV090","2019-06-01","PTS-12","UK","Jeffrey Roberts",5000,3000,9,45000],["INV091","2018-01-11","PTS-10","HK","Susan James",15000,14000,5,75000],["INV092","2020-07-20","PTS-13","HK","Justin Richardson",23000,13000,9,207000],["INV093","2018-09-19","PTS-10","AU","Harold Garcia",17000,14000,8,136000],["INV094","2020-01-04","PTS-13","AU","Marilyn Mitchell",22000,13000,9,198000],["INV095","2018-06-19","PTS-10","US","Christina Perez",23000,14000,8,184000],["INV096","2018-10-22","PTS-11","US","Carol Morris",7000,4000,8,56000],["INV097","2019-11-18","PTS-13","US","Jane Brown",24000,13000,9,216000],["INV098","2018-05-05","PTS-10","JP","Christine Taylor",19000,14000,5,95000],["INV099","2018-10-28","PTS-13","AU","Jerry Coleman",22000,13000,9,198000]];
+const C = {INV:0,DATE:1,PROD:2,DEST:3,CUST:4,UP:5,UC:6,QTY:7,REV:8};
+const fmt = n => n.toLocaleString('en-US');
+const hkm = n => 'HK$ ' + fmt(Math.round(n));
+
+const tip = document.getElementById('tip');
+function showTip(html, x, y){
+  tip.innerHTML = html; tip.classList.add('show');
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let L = x + 14, T = y + 14;
+  if (L + w > innerWidth - 8) L = x - w - 14;
+  if (T + h > innerHeight - 8) T = y - h - 14;
+  tip.style.left = L + 'px'; tip.style.top = T + 'px';
+}
+function hideTip(){ tip.classList.remove('show'); }
+
+function agg(rows, keyFn){
+  const m = {};
+  rows.forEach(r=>{ const k = keyFn(r); (m[k] = m[k] || {rev:0,qty:0,n:0}); m[k].rev += r[C.REV]; m[k].qty += r[C.QTY]; m[k].n += 1; });
+  return m;
+}
+function sortedRev(obj){ return Object.entries(obj).sort((a,b)=>b[1].rev - a[1].rev); }
+
+const NS = 'http://www.w3.org/2000/svg';
+function el(t, a, parent){ const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (parent) parent.appendChild(e); return e; }
+const PALETTE = ['#2f6fed','#1a9e5c','#d9821a','#8b5cf6','#d64545','#0ea5e9','#e11d48','#334155'];
+
+function barLine(id, groups){
+  const svg = document.getElementById(id), W = 560, H = 280, P = {l:56, r:44, t:14, b:34};
+  svg.innerHTML = '';
+  const iw = W-P.l-P.r, ih = H-P.t-P.b;
+  const maxL = Math.max(...groups.map(g=>Math.max(...g.bars.map(b=>b.v))) || [0]);
+  const maxR = Math.max(...groups.map(g=>g.line.v) || [0]);
+  const sx = iw/groups.length, bw = Math.min(40, sx*0.42);
+  for (let i=0;i<=4;i++){
+    const y = P.t + ih - ih*i/4;
+    el('line', {x1:P.l, x2:P.l+iw, y1:y, y2:y, stroke:'var(--border)'}, svg);
+    el('text', {x:P.l-8, y:y+4, 'text-anchor':'end', 'font-size':10, fill:'var(--muted)'}, svg).textContent = fmt(maxL/4*i);
+    el('text', {x:P.l+iw+8, y:y+4, 'text-anchor':'start', 'font-size':10, fill:'var(--good)'}, svg).textContent = fmt(maxR/4*i);
+  }
+  const cx0 = P.l + sx*0.5;
+  groups.forEach((g,i)=>{
+    const x0 = P.l + sx*i + (sx-bw*g.bars.length)/2;
+    g.bars.forEach((b,j)=>{
+      const bh = maxL ? b.v/maxL*ih : 0, x = x0 + j*(bw+3);
+      const r = el('rect', {x, y:P.t+ih-bh, width:bw, height:bh, fill:b.color, rx:3}, svg);
+      r.style.transition = 'opacity .15s';
+      r.addEventListener('mousemove', e=>showTip(`<b>${g.label}</b><br>${b.name}：${hkm(b.v)}`, e.clientX, e.clientY));
+      r.addEventListener('mouseleave', hideTip);
+    });
+    el('text', {x:P.l + sx*(i+0.5), y:P.t+ih+20, 'text-anchor':'middle', 'font-size':11, fill:'var(--ink)'}, svg).textContent = g.label;
+  });
+  const pts = groups.map((g,i)=>[P.l + sx*(i+0.5), P.t + ih - (maxR ? g.line.v/maxR*ih : 0)]);
+  el('polyline', {points:pts.map(p=>p.join(',')).join(' '), fill:'none', stroke:'var(--good)', 'stroke-width':2.5}, svg);
+  pts.forEach((p,i)=>{
+    const c = el('circle', {cx:p[0], cy:p[1], r:4, fill:'var(--good)'}, svg);
+    c.addEventListener('mousemove', e=>showTip(`<b>${groups[i].label}</b><br>銷量：${fmt(groups[i].line.v)} 件`, e.clientX, e.clientY));
+    c.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function hbars(id, entries){
+  const svg = document.getElementById(id), W = 560, H = 280, P = {l:88, r:90, t:10, b:10};
+  svg.innerHTML = '';
+  const iw = W-P.l-P.r, ih = H-P.t-P.b, n = entries.length;
+  const bh = Math.min(34, ih/n*0.7), gap = n>1 ? (ih-bh*n)/(n-1) : 0;
+  const max = Math.max(...entries.map(e=>e.v)) || 1;
+  const tot = entries.reduce((a,e)=>a+e.v,0);
+  entries.forEach((e,i)=>{
+    const y = P.t + i*(bh+gap), w = e.v/max*iw;
+    el('text', {x:P.l-8, y:y+bh/2+4, 'text-anchor':'end', 'font-size':12, fill:'var(--ink)'}, svg).textContent = e.label;
+    const r = el('rect', {x:P.l, y, width:w, height:bh, fill:PALETTE[i%PALETTE.length], rx:4}, svg);
+    r.style.transition = 'opacity .15s';
+    r.addEventListener('mousemove', ev=>{ showTip(`<b>${e.label}</b><br>營收：${hkm(e.v)}（${(e.v/tot*100).toFixed(1)}%）`, ev.clientX, ev.clientY); r.style.opacity=.8; });
+    r.addEventListener('mouseleave', ()=>{ hideTip(); r.style.opacity=1; });
+    el('text', {x:P.l+w+8, y:y+bh/2+4, 'font-size':11, fill:'var(--muted)'}, svg).textContent = hkm(e.v);
+  });
+}
+
+function pie(id, entries, legendId){
+  const svg = document.getElementById(id), W = 560, H = 280, cx = W/2, cy = H/2, R = 105;
+  svg.innerHTML = '';
+  const total = entries.reduce((a,e)=>a+e.v,0) || 1;
+  let a0 = -Math.PI/2;
+  const grp = el('g', {transform:`translate(${cx},${cy})`}, svg);
+  entries.forEach((e,i)=>{
+    const a1 = a0 + e.v/total*Math.PI*2, large = (a1-a0) > Math.PI ? 1 : 0;
+    const x0 = Math.cos(a0)*R, y0 = Math.sin(a0)*R, x1 = Math.cos(a1)*R, y1 = Math.sin(a1)*R;
+    const p = el('path', {d:`M0,0 L${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1} Z`, fill:PALETTE[i%PALETTE.length], stroke:'var(--surface)', 'stroke-width':2}, grp);
+    p.style.transition = 'transform .15s';
+    p.addEventListener('mousemove', ev=>{ showTip(`<b>${e.label}</b><br>${hkm(e.v)}（${(e.v/total*100).toFixed(1)}%）`, ev.clientX, ev.clientY); p.style.transform='scale(1.04)'; p.style.transformOrigin='center'; });
+    p.addEventListener('mouseleave', ()=>{ hideTip(); p.style.transform=''; });
+    a0 = a1;
+  });
+  el('circle', {cx:0, cy:0, r:58, fill:'var(--surface)'}, grp);
+  el('text', {x:0, y:-6, 'text-anchor':'middle', 'font-size':11, fill:'var(--muted)'}, grp).textContent = '總營收';
+  el('text', {x:0, y:15, 'text-anchor':'middle', 'font-size':17, 'font-weight':'700', fill:'var(--ink)'}, grp).textContent = fmt(total);
+  const lg = document.getElementById(legendId);
+  lg.innerHTML = entries.map((e,i)=>`<span><i style="background:${PALETTE[i%PALETTE.length]}"></i>${e.label}（${(e.v/total*100).toFixed(1)}%）</span>`).join('');
+}
+
+function renderAll(rows){
+  const totalRev = rows.reduce((a,r)=>a+r[C.REV],0) || 1;
+  const byY = sortedRev(agg(rows, r=>r[C.DATE].slice(0,4)));
+  barLine('chartYear', byY.map(([k,v])=>({label:k, bars:[{name:'營收', v:v.rev, color:'var(--accent)'}], line:{v:v.qty}})));
+  const m = agg(rows, r=>r[C.DATE].slice(0,7));
+  const months = Object.keys(m).sort();
+  barLine('chartMonth', months.map(k=>({label:k, bars:[{name:'營收', v:m[k].rev, color:'var(--accent)'}], line:{v:m[k].qty}})));
+  const d = sortedRev(agg(rows, r=>r[C.DEST]));
+  pie('chartDest', d.map(([k,v])=>({label:k, v:v.rev})), 'legendDest');
+  const p = sortedRev(agg(rows, r=>r[C.PROD]));
+  hbars('chartProd', p.map(([k,v])=>({label:k, v:v.rev})));
+  document.getElementById('destBars').innerHTML = d.map(([k,v])=>{
+    const pct = v.rev/totalRev*100;
+    return `<div class="hbar"><span class="name">${k}</span><span class="track"><span class="fill" style="width:${pct}%"></span></span><span class="pct">${pct.toFixed(1)}%</span></div>`;
+  }).join('');
+}
+
+const detailBody = document.getElementById('detailBody');
+const q = document.getElementById('q'), fDest = document.getElementById('fDest'), fProd = document.getElementById('fProd'), fYear = document.getElementById('fYear');
+let sortK = -1, sortAsc = true;
+function currentRows(){
+  let r = DATA;
+  if (fDest.value) r = r.filter(x=>x[C.DEST]===fDest.value);
+  if (fProd.value) r = r.filter(x=>x[C.PROD]===fProd.value);
+  if (fYear.value) r = r.filter(x=>x[C.DATE].slice(0,4)===fYear.value);
+  const s = q.value.trim().toLowerCase();
+  if (s) r = r.filter(x=>[x[C.INV],x[C.PROD],x[C.CUST],x[C.DEST]].join(' ').toLowerCase().includes(s));
+  if (sortK >= 0){
+    r = r.slice().sort((a,b)=>{
+      const x = a[sortK], y = b[sortK];
+      const c = typeof x === 'number' ? x-y : String(x).localeCompare(String(y));
+      return sortAsc ? c : -c;
+    });
+  }
+  return r;
+}
+function renderTable(){
+  const r = currentRows();
+  detailBody.innerHTML = r.map(x=>`<tr><td>${x[C.INV]}</td><td>${x[C.DATE]}</td><td>${x[C.PROD]}</td><td>${x[C.DEST]}</td><td>${x[C.CUST]}</td><td class="num">${fmt(x[C.UP])}</td><td class="num">${fmt(x[C.UC])}</td><td class="num">${x[C.QTY]}</td><td class="num"><b>${fmt(x[C.REV])}</b></td></tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">無符合條件之訂單</td></tr>';
+  document.getElementById('rowCount').textContent = r.length + ' 筆';
+  document.getElementById('tblNote').textContent = `顯示 ${r.length} / ${DATA.length} 筆` + (r.length===DATA.length?'（全數）':'');
+}
+document.querySelectorAll('#detail thead th').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const k = +th.dataset.k;
+    sortAsc = (sortK===k) ? !sortAsc : true; sortK = k;
+    document.querySelectorAll('#detail thead th').forEach(t=>t.removeAttribute('aria-sort'));
+    th.setAttribute('aria-sort', sortAsc?'ascending':'descending');
+    renderTable();
+  });
+});
+[q,fDest,fProd,fYear].forEach(e=>e.addEventListener('input', renderTable));
+document.getElementById('reset').addEventListener('click', ()=>{
+  q.value=''; fDest.value=''; fProd.value=''; fYear.value=''; sortK=-1;
+  document.querySelectorAll('#detail thead th').forEach(t=>t.removeAttribute('aria-sort'));
+  renderTable();
+});
+
+renderAll(DATA);
+renderTable();
+</script>
+</body>
+</html>
