@@ -1,247 +1,389 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arthur Kwok｜Web 專案導覽</title>
+<title>Todo</title>
 <style>
-:root{
-  --bg:#0d1220;--surface:#161d30;--surface2:#1c2540;--ink:#eef2fb;--muted:#93a0b8;
-  --line:#263252;--accent:#38bdf8;--accent2:#34d399;--live:#34d399;--dev:#fbbf24;
-  --radius:14px;
-}
-.light{
-  --bg:#f2f5fb;--surface:#ffffff;--surface2:#eef2fa;--ink:#141a26;--muted:#5c667a;
-  --line:#dde4f0;--accent:#0284c7;--accent2:#059669;--live:#059669;--dev:#d97706;
-}
-*{box-sizing:border-box;margin:0}
-body{
-  font-family:"Inter","PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
-  background:var(--bg);color:var(--ink);line-height:1.6;min-height:100vh;
-}
-body{transition:background .3s,color .3s}
-.wrap{max-width:1080px;margin:0 auto;padding:40px 24px 64px}
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --ink: #17181c;
+    --ink-muted: #6b7078;
+    --ink-faint: #9aa0a8;
+    --border: #e6e8eb;
+    --accent: #1a6dff;
+    --accent-soft: #eaf2ff;
+    --danger: #e5484d;
+    --danger-soft: #fdebec;
+    --done-ink: #b6bcc4;
+    --shadow-sm: 0 1px 2px rgba(23,24,28,.05);
+    --shadow-md: 0 4px 16px rgba(23,24,28,.08);
+    --radius: 10px;
+    --font: -apple-system, "SF Pro Text", "Segoe UI", system-ui, "PingFang HK", "Noto Sans TC", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101114;
+      --surface: #191a1e;
+      --ink: #e8eaed;
+      --ink-muted: #9ba0a8;
+      --ink-faint: #5f646c;
+      --border: #2a2c31;
+      --accent: #4d8dff;
+      --accent-soft: #1b2a44;
+      --danger: #f2555a;
+      --danger-soft: #3a1d1f;
+      --done-ink: #565b63;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.45);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 480px;
+    padding: 48px 20px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .count {
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .count strong { color: var(--ink); font-weight: 600; }
 
-/* header */
-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:28px}
-h1{font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;line-height:1.2}
-.tagline{color:var(--muted);font-size:14px;margin-top:4px}
-.head-actions{display:flex;gap:8px}
-.icon-btn{
-  width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
-  color:var(--ink);font-size:16px;cursor:pointer;display:grid;place-items:center;transition:background .2s}
-.icon-btn:hover{background:var(--surface2)}
-.icon-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* ---- Add form ---- */
+  .add-form {
+    display: flex;
+    gap: 8px;
+  }
+  .add-form input {
+    flex: 1;
+    min-width: 0;
+    height: 46px;
+    padding: 0 14px;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .add-form input::placeholder { color: var(--ink-faint); }
+  .add-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .add-form button {
+    height: 46px;
+    padding: 0 18px;
+    font: inherit;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: filter .15s, transform .05s;
+  }
+  .add-form button:hover { filter: brightness(1.08); }
+  .add-form button:active { transform: scale(.98); }
+  .add-form button:focus-visible { outline: 3px solid var(--accent-soft); }
 
-/* toolbar */
-.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.search{position:relative;flex:1;min-width:220px}
-.search input{
-  width:100%;height:46px;padding:0 16px 0 42px;font:inherit;font-size:15px;color:var(--ink);
-  background:var(--surface);border:1px solid var(--line);border-radius:12px}
-.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
-.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{
-  padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);
-  color:var(--ink);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit}
-.chip:hover{border-color:var(--accent)}
-.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.light .chip.active{color:#fff}
+  /* ---- Filters ---- */
+  .filters {
+    display: flex;
+    gap: 6px;
+    padding: 0 2px;
+  }
+  .filters button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: transparent;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .filters button:hover { background: var(--accent-soft); color: var(--accent); }
+  .filters button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+  .filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.count{font-size:13px;color:var(--muted);margin:14px 0 18px}
+  /* ---- List ---- */
+  ul.todo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .todo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    animation: enter .18s ease-out;
+  }
+  @keyframes enter {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .check {
+    flex: 0 0 auto;
+    width: 24px; height: 24px;
+    min-width: 24px;
+    display: grid;
+    place-items: center;
+  }
+  .check input {
+    appearance: none;
+    width: 22px; height: 22px;
+    border: 2px solid var(--ink-faint);
+    border-radius: 6px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .15s, border-color .15s;
+  }
+  .check input:hover { border-color: var(--accent); }
+  .check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .check input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-size: 15px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .todo-text {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    transition: color .2s;
+  }
+  .todo.done .todo-text {
+    color: var(--done-ink);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .delete {
+    flex: 0 0 auto;
+    width: 34px; height: 34px;
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    color: var(--ink-faint);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s, background .15s, color .15s;
+  }
+  .todo:hover .delete, .todo:focus-within .delete, .delete:focus-visible { opacity: 1; }
+  .delete:hover { background: var(--danger-soft); color: var(--danger); }
+  .delete:focus-visible { outline: 2px solid var(--accent); }
+  @media (hover: none) { .delete { opacity: 1; } }
 
-/* cards */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{
-  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-  padding:22px;display:flex;flex-direction:column;gap:12px;position:relative;
-  transition:transform .15s,border-color .15s,box-shadow .15s}
-.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.cat{
-  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);
-  padding:3px 10px;border-radius:999px}
-.status{font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
-.status .dot{width:8px;height:8px;border-radius:50%}
-.status.live{color:var(--live)} .status.live .dot{background:var(--live);box-shadow:0 0 8px var(--live)}
-.status.dev{color:var(--dev)} .status.dev .dot{background:var(--dev)}
-.card h2{font-size:19px;letter-spacing:-.01em}
-.card p{font-size:14px;color:var(--muted);flex:1}
-.stack{display:flex;gap:6px;flex-wrap:wrap}
-.stack span{
-  font-size:11.5px;font-weight:600;color:var(--muted);
-  background:var(--surface2);border:1px solid var(--line);padding:3px 9px;border-radius:6px}
-.card-link{
-  display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--accent);
-  text-decoration:none;margin-top:2px}
-.card-link:hover{text-decoration:underline}
-.card-link svg{width:15px;height:15px}
+  /* ---- Empty state ---- */
+  .empty {
+    display: none;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 14px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+  .empty.visible { display: block; }
+  .empty strong { display: block; color: var(--ink-muted); font-size: 15px; margin-bottom: 4px; }
 
-/* empty */
-.empty{
-  display:none;text-align:center;padding:60px 20px;color:var(--muted);
-  border:1px dashed var(--line);border-radius:var(--radius);background:var(--surface)}
-.empty.show{display:block}
-.empty .big{font-size:40px;margin-bottom:10px}
+  .clear-done {
+    margin: 4px 2px 0;
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink-faint);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .clear-done:hover { color: var(--danger); text-decoration: underline; }
+  .clear-done[hidden] { display: none; }
 
-footer{margin-top:48px;text-align:center;font-size:12.5px;color:var(--muted)}
-footer code{background:var(--surface);border:1px solid var(--line);padding:2px 7px;border-radius:5px;font-size:11.5px}
-
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media (max-width:560px){
-  .wrap{padding:24px 14px 48px}
-  .search input{height:42px}
-}
+  @media (prefers-reduced-motion: reduce) {
+    .todo { animation: none; }
+    * { transition: none !important; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Arthur Kwok｜Web 專案導覽</h1>
-      <p class="tagline">所有前端專案集中一處：搜尋、分類篩選、一鍵進入。</p>
+  <main class="app">
+    <header>
+      <h1>待辦事項</h1>
+      <span class="count" id="count" aria-live="polite"></span>
+    </header>
+
+    <form class="add-form" id="add-form" autocomplete="off">
+      <input id="new-todo" type="text" placeholder="新增待辦事項…" aria-label="新增待辦事項" maxlength="200">
+      <button type="submit">新增</button>
+    </form>
+
+    <nav class="filters" aria-label="篩選">
+      <button type="button" data-filter="all" aria-pressed="true">全部</button>
+      <button type="button" data-filter="active" aria-pressed="false">未完成</button>
+      <button type="button" data-filter="done" aria-pressed="false">已完成</button>
+    </nav>
+
+    <ul class="todo-list" id="list"></ul>
+    <div class="empty" id="empty">
+      <strong>暂无事項</strong>
+      喺上面輸入框加入第一項待辦，按 Enter 確認。
     </div>
-    <div class="head-actions">
-      <button class="icon-btn" id="bTheme" title="切換明暗模式" aria-label="切換明暗模式">◐</button>
-      <button class="icon-btn" id="bJson" title="開啟 projects.json" aria-label="開啟 projects.json">⚡</button>
-    </div>
-  </header>
-
-  <div class="toolbar">
-    <div class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="q" type="search" placeholder="搜尋專案名稱、簡介、技術…（例：Todo、儀表板、SVG）" aria-label="搜尋專案">
-    </div>
-    <div class="chips" id="chips" role="group" aria-label="分類篩選"></div>
-  </div>
-
-  <p class="count" id="count" aria-live="polite"></p>
-
-  <div class="grid" id="grid" aria-live="polite"></div>
-
-  <div class="empty" id="empty">
-    <div class="big">🔍</div>
-    <p>找不到符合條件的專案。請嘗試清除搜尋或切換分類。</p>
-    <button class="chip" id="reset" style="margin-top:14px">重設篩選</button>
-  </div>
-
-  <footer>新增專案只需編輯 <code>projects.json</code> 並推送至 main 分支，頁面自動由 CI 重新部署。</footer>
-</div>
+    <button class="clear-done" id="clear-done" hidden>清除已完成</button>
+  </main>
 
 <script>
-(function(){
-"use strict";
+(function () {
+  "use strict";
+  var STORAGE_KEY = "todos.v1";
+  var todos = load();
+  var filter = "all";
 
-/* ---------- state ---------- */
-let DATA = null;
-let activeCat = "全部";
+  var form = document.getElementById("add-form");
+  var input = document.getElementById("new-todo");
+  var list = document.getElementById("list");
+  var empty = document.getElementById("empty");
+  var count = document.getElementById("count");
+  var clearBtn = document.getElementById("clear-done");
+  var filterBtns = document.querySelectorAll(".filters button");
 
-const $ = id => document.getElementById(id);
-const grid = $("grid"), empty = $("empty"), count = $("count"), chips = $("chips");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = input.value.trim();
+    if (!text) return;
+    todos.push({ id: Date.now().toString(36), text: text, done: false });
+    input.value = "";
+    input.focus();
+    save(); render();
+  });
 
-const STATUS_MAP = {
-  "已上線": "live", "開發中": "dev"
-};
+  list.addEventListener("change", function (e) {
+    if (!e.target.matches('input[type="checkbox"]')) return;
+    var id = e.target.closest(".todo").dataset.id;
+    var t = todos.find(function (x) { return x.id === id; });
+    if (t) { t.done = e.target.checked; save(); render(); }
+  });
 
-/* ---------- render ---------- */
-function esc(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+  list.addEventListener("click", function (e) {
+    var btn = e.target.closest(".delete");
+    if (!btn) return;
+    var id = btn.closest(".todo").dataset.id;
+    todos = todos.filter(function (x) { return x.id !== id; });
+    save(); render();
+  });
 
-function renderChips(cats){
-  const all = ["全部", ...cats];
-  chips.innerHTML = all.map(c =>
-    `<button class="chip${c===activeCat?" active":""}" data-c="${esc(c)}" aria-pressed="${c===activeCat}">${esc(c)}</button>`
-  ).join("");
-  chips.querySelectorAll(".chip").forEach(b=>{
-    b.addEventListener("click",()=>{
-      activeCat = b.dataset.c;
-      renderChips(cats);
-      applyFilters();
+  clearBtn.addEventListener("click", function () {
+    todos = todos.filter(function (t) { return !t.done; });
+    save(); render();
+  });
+
+  filterBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      filter = btn.dataset.filter;
+      filterBtns.forEach(function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+      render();
     });
   });
-}
 
-function visibleProjects(){
-  const q = $("q").value.trim().toLowerCase();
-  return DATA.projects.filter(p=>{
-    if(activeCat!=="全部" && p.category!==activeCat) return false;
-    if(!q) return true;
-    const hay = [p.name, p.description, (p.stack||[]).join(" "), p.category, p.status].join(" ").toLowerCase();
-    return q.split(/\s+/).every(w=>hay.includes(w));
-  });
-}
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  }
 
-function renderCards(list){
-  if(!list.length){ grid.style.display="none"; empty.classList.add("show"); return; }
-  grid.style.display=""; empty.classList.remove("show");
-  grid.innerHTML = list.map(p=>{
-    const st = STATUS_MAP[p.status] || "dev";
-    const stLabel = esc(p.status);
-    return `
-    <article class="card">
-      <div class="card-top">
-        <span class="cat">${esc(p.category)}</span>
-        <span class="status ${st}"><span class="dot"></span>${stLabel}</span>
-      </div>
-      <h2>${esc(p.name)}</h2>
-      <p>${esc(p.description)}</p>
-      <div class="stack">${(p.stack||[]).map(s=>`<span>${esc(s)}</span>`).join("")}</div>
-      <a class="card-link" href="${esc(p.url)}" ${/^https?:/.test(p.url)?"target='_blank' rel='noopener'":""} aria-label="開啟 ${esc(p.name)}">
-        開啟專案
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-      </a>
-    </article>`;
-  }).join("");
-  count.textContent = `顯示 ${list.length} / ${DATA.projects.length} 個專案`;
-}
+  function render() {
+    var visible = todos.filter(function (t) {
+      return filter === "all" ? true : (filter === "done" ? t.done : !t.done);
+    });
+    list.innerHTML = "";
+    visible.forEach(function (t) {
+      var li = document.createElement("li");
+      li.className = "todo" + (t.done ? " done" : "");
+      li.dataset.id = t.id;
 
-function applyFilters(){ renderCards(visibleProjects()); }
+      var check = document.createElement("label");
+      check.className = "check";
+      var cb = document.createElement("input");
+      cb.type = "checkbox"; cb.checked = t.done;
+      cb.setAttribute("aria-label", "標記完成：" + t.text);
+      check.appendChild(cb);
 
-/* ---------- theme ---------- */
-function setTheme(t){
-  document.body.classList.toggle("light", t==="light");
-  try{ localStorage.setItem("nav-theme", t); }catch(e){}
-}
+      var span = document.createElement("span");
+      span.className = "todo-text";
+      span.textContent = t.text;
 
-/* ---------- init ---------- */
-function init(data){
-  DATA = data;
-  const cats = data.categories || [...new Set(data.projects.map(p=>p.category))];
-  activeCat = "全部";
-  renderChips(cats);
-  applyFilters();
-}
+      var del = document.createElement("button");
+      del.className = "delete";
+      del.type = "button";
+      del.textContent = "✕";
+      del.setAttribute("aria-label", "刪除：" + t.text);
 
-fetch("projects.json")
-  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
-  .then(init)
-  .catch(err=>{
-    grid.style.display="none";
-    empty.classList.add("show");
-    empty.querySelector("p").textContent = "無法載入 projects.json（"+err.message+"）。請確認檔案存在且為有效 JSON。";
-  });
+      li.append(check, span, del);
+      list.appendChild(li);
+    });
 
-/* ---------- events ---------- */
-$("q").addEventListener("input", applyFilters);
-$("reset").addEventListener("click",()=>{
-  $("q").value=""; activeCat="全部";
-  renderChips(DATA ? (DATA.categories||[]) : []);
-  applyFilters();
-});
-$("bTheme").addEventListener("click",()=>{
-  setTheme(document.body.classList.contains("light")?"dark":"light");
-});
-$("bJson").addEventListener("click",()=>{ location.href="projects.json"; });
+    var remaining = todos.filter(function (t) { return !t.done }).length;
+    var doneN = todos.length - remaining;
+    count.innerHTML = "<strong>" + remaining + "</strong> 未完成 · 共 " + todos.length;
+    empty.classList.toggle("visible", visible.length === 0);
+    clearBtn.hidden = doneN === 0;
+  }
 
-/* theme restore */
-try{
-  const t = localStorage.getItem("nav-theme") || (matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");
-  setTheme(t);
-}catch(e){}
+  render();
 })();
 </script>
 </body>
